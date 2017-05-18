@@ -8,7 +8,7 @@ import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.*;
 import java.lang.Math;
 
-public interface CSP {
+public class CSP {
 	static final int rookPos = 0, bishopPos = 1, knightPos = 2;
 	static final char[] pieces = {'T','F','C'};
 	
@@ -27,7 +27,10 @@ public interface CSP {
 		CSP.addIndependanceBishop(boardSize, model, variables);
 		// knights
 		CSP.addIndependanceKnight(boardSize, model, variables);
+		// right amount of each pieces
 		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model);
+		// at most one piece at each position
+		CSP.addUnicityConstraint(boardSize, variables, model);
 		
 		// solve
 		Solution solution = model.getSolver().findSolution();
@@ -128,7 +131,6 @@ public interface CSP {
 	
 	static void addConstraintPiecesCounters(int boardSize, int k1, int k2, int k3, BoolVar[] variables, Model model){
 		BoolVar[] rooks = new BoolVar[boardSize*boardSize], bishops = new BoolVar[boardSize*boardSize], knights = new BoolVar[boardSize*boardSize];
-		int counter = 0;
 		for (int i=0; i<boardSize; i++){
 			for (int j=0; j<boardSize; j++){
 				rooks[i*boardSize+j] = variables[(i*boardSize*boardSize)+j*boardSize+rookPos];
@@ -139,6 +141,19 @@ public interface CSP {
 		model.sum(rooks, "==", k1);
 		model.sum(bishops, "==", k2);
 		model.sum(knights, "==", k3);
+	}
+	
+	static void addUnicityConstraint(int boardSize, BoolVar[] variables, Model model){
+		BoolVar[] pos;
+		for (int i=0; i<boardSize; i++){
+			for (int j=0; j<boardSize; j++){
+				pos = new BoolVar[pieces.length];
+				for (int v=0; v<pieces.length; v++){
+					pos[v] = variables[(i*boardSize*boardSize)+j*boardSize+v];
+				}
+				model.sum(pos, "<=", 1);
+			}
+		}
 	}
 	
 	static IntVar getX(IntVar[] variables, int boardSize, int i, int j, char v){
