@@ -25,7 +25,6 @@ public class Main {
 
 	    while (index < parameters.length) {
 
-
             if (parameters[index].equals("-i")) result[4] = 1;
             else if (parameters[index].equals("-d")) result[4] = 0;
             else if (parameters[index].equals("-n")) {

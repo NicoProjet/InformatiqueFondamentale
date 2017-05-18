@@ -22,15 +22,15 @@ public class CSP {
 		
 		// add constraints
 		// rooks
-		CSP.addIndependanceRook(boardSize, model, variables);
+		//CSP.addIndependanceRook(boardSize, model, variables);
 		// bishops
-		CSP.addIndependanceBishop(boardSize, model, variables);
+		//CSP.addIndependanceBishop(boardSize, model, variables);
 		// knights
-		CSP.addIndependanceKnight(boardSize, model, variables);
+		//CSP.addIndependanceKnight(boardSize, model, variables);
 		// right amount of each pieces
 		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model);
 		// at most one piece at each position
-		CSP.addUnicityConstraint(boardSize, variables, model);
+		//CSP.addUnicityConstraint(boardSize, variables, model);
 		
 		// solve
 		Solution solution = model.getSolver().findSolution();
@@ -138,9 +138,9 @@ public class CSP {
 				knights[i*boardSize+j] = variables[(i*boardSize*boardSize)+j*boardSize+knightPos];
 			}
 		}
-		model.sum(rooks, "==", k1);
-		model.sum(bishops, "==", k2);
-		model.sum(knights, "==", k3);
+		model.sum(rooks, "=", k1).post();
+		model.sum(bishops, "=", k2).post();
+		model.sum(knights, "=", k3).post();
 	}
 	
 	static void addUnicityConstraint(int boardSize, BoolVar[] variables, Model model){
@@ -151,7 +151,7 @@ public class CSP {
 				for (int v=0; v<pieces.length; v++){
 					pos[v] = variables[(i*boardSize*boardSize)+j*boardSize+v];
 				}
-				model.sum(pos, "<=", 1);
+				model.sum(pos, "<=", 1).post();
 			}
 		}
 	}
@@ -163,7 +163,7 @@ public class CSP {
 				valueIndex = k;
 			}
 		}
-		return variables[(i*boardSize+j)*boardSize*boardSize+valueIndex];
+		return variables[(i*boardSize*boardSize)+j*boardSize+valueIndex];
 	}
 
 }
