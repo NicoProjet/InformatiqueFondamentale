@@ -157,27 +157,28 @@ public class CSP {
 			for (int j = 0; j<boardSize; j++){
 				System.out.println("\n\n ==> pos = ("+i+","+j+")");
 				// System.out.println("\n->  i: "+i+" | j: "+j);
-				Constraint c = model.and(model.boolVar()); // always true
+				//Constraint c = model.and(model.boolVar()); // always true
 				// checks if there is a piece (i found it clearer that way than adding a for (i++<3)
 				// but adding more different pieces might change that
-				System.out.println("si T en ("+i+","+j+")");
-				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+rookPos].not()));
-				System.out.println("si F en ("+i+","+j+")");
-				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+bishopPos].not()));
-				System.out.println("si C en ("+i+","+j+")");
-				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+knightPos].not()));
+				System.out.println("OU T en ("+i+","+j+")");
+				//c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+rookPos].not()),c);
+				Constraint c = model.and(variables[i*boardSize*boardSize+j*boardSize+rookPos].not());
+				System.out.println("OU F en ("+i+","+j+")");
+				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+bishopPos].not()),c.getOpposite());
+				System.out.println("OU C en ("+i+","+j+")");
+				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+knightPos].not()),c.getOpposite());
 				
-				// c = Constraint.merge("", model.and(model.boolVar().not())); // test ajout ( or true )
+				// c = Constraint.merge("", model.and(model.boolVar().not()),c.getOpposite()); // test ajout ( or true )
 				
-				
+				/*
 				// threatened by rooks
 				System.out.println("threatened by rooks?:");
 				for (int k = 0; k<boardSize; k++){
 					if(k != i){
-						System.out.println("si T en ("+i+","+k+") et ("+k+","+j+")");
+						System.out.println("OU T en ("+i+","+k+") et ("+k+","+j+")");
 						// System.out.println("k: "+k); // correct rooks positions
-						c = Constraint.merge("", model.and(variables[(k*boardSize*boardSize)+j*boardSize+rookPos].not()));
-						c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+k*boardSize+rookPos].not()));
+						c = Constraint.merge("", model.and(variables[(k*boardSize*boardSize)+j*boardSize+rookPos].not()),c.getOpposite());
+						c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+k*boardSize+rookPos].not()),c.getOpposite());
 					}
 				}
 				
@@ -188,8 +189,8 @@ public class CSP {
 					for (int l = 0; l<boardSize; l++){
 						if(i != k && j != l && Math.abs(i-k) == Math.abs(j-l)){
 							// System.out.println("k: "+k+" | l: "+l); // correct bishops positions
-							System.out.println("si F en ("+k+","+l+")");
-							c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+j*boardSize+bishopPos].not()));
+							System.out.println("OU F en ("+k+","+l+")");
+							c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+j*boardSize+bishopPos].not()),c.getOpposite());
 						}
 					}
 				}
@@ -205,14 +206,14 @@ public class CSP {
 							if (0<=l && l<boardSize){
 								if (Math.abs(i-k) + Math.abs(j-l) == 3){
 									// System.out.println("k: "+k+" | l: "+l); // correct knights positions
-									System.out.println("si C en ("+k+","+l+")");
-									c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+j*boardSize+knightPos].not()));
+									System.out.println("OU C en ("+k+","+l+")");
+									c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+j*boardSize+knightPos].not()),c.getOpposite());
 								}
 							}
 						}
 					}
 				}
-				
+				*/
 				c.getOpposite().post();
 			}
 		}
