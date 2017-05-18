@@ -22,24 +22,27 @@ public class CSP {
 		
 		// add constraints
 		// rooks
-		//CSP.addIndependanceRook(boardSize, model, variables);
+		CSP.addIndependanceRook(boardSize, model, variables);
 		// bishops
-		//CSP.addIndependanceBishop(boardSize, model, variables);
+		CSP.addIndependanceBishop(boardSize, model, variables);
 		// knights
-		//CSP.addIndependanceKnight(boardSize, model, variables);
+		CSP.addIndependanceKnight(boardSize, model, variables);
 		// right amount of each pieces
 		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model);
 		// at most one piece at each position
-		//CSP.addUnicityConstraint(boardSize, variables, model);
+		CSP.addUnicityConstraint(boardSize, variables, model);
 		
 		// solve
 		Solution solution = model.getSolver().findSolution();
+		
+		// print
+		/*
 		if(solution != null){
 			System.out.println(solution.toString());
 		}
-		
-		// print
-		//Board board = new Board(boardSize);
+		*/
+		Board board = CSP.toBoard(model, variables, boardSize);
+		System.out.println(board);
 	}
 	
 	static void domination(int n, int k1, int k2, int k3){
@@ -154,6 +157,30 @@ public class CSP {
 				model.sum(pos, "<=", 1).post();
 			}
 		}
+	}
+	
+	static Board toBoard(Model model, IntVar[] variables, int boardSize){
+		Board board = new Board(boardSize);
+		for (int i = 0; i < boardSize; i++){
+			for (int j = 0; j<boardSize; j++){
+				for (int v=0; v<pieces.length; v++){
+					if (variables[i*boardSize*boardSize+j*boardSize+v].getValue() == 1){
+						switch(v){
+							case 0:
+								board.addPiece(i,j,new Rook(i,j));
+								break;
+							case 1:
+								board.addPiece(i,j,new Bishop(i,j));
+								break;
+							case 2:
+								board.addPiece(i,j,new Knight(i,j));
+								break;
+						}
+					}
+				}
+			}
+		}
+		return board;
 	}
 	
 	static IntVar getX(IntVar[] variables, int boardSize, int i, int j, char v){

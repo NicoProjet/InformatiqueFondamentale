@@ -7,6 +7,7 @@ public abstract class ChessPiece {
 	public int getX(){return _x;}
 	public int getY(){return _y;}
 	
-	abstract void draw(Board board);
-	abstract void drawTargets(Board board);
+	public abstract void addToBoard(Board board);
+	public abstract String toString();
+	public abstract void drawTargets(Board board);
 }

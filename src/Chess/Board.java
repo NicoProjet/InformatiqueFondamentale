@@ -2,27 +2,34 @@ package Chess;
 
 public class Board {
 	private int _n;
-	private char[][] _board;
+	private ChessPiece[][] _board;
 	
 	public Board(int n){
 		_n = n;
-		_board = new char[_n][_n];
+		_board = new ChessPiece[_n][_n];
 	}
 	
 	public void addPiece(ChessPiece p){
-		p.draw(this);
+		p.addToBoard(this);
 	}
 	
-	public void addPiece(int x, int y, char v){
-		_board[x][y] = v;
+	public void addPiece(int x, int y, ChessPiece p){
+		_board[x][y] = p;
 	}
-
-	public void print(){
+	
+	public String toString(){
+		String s = "";
 		for (int i=0; i<_n; i++){
 			for (int j=0; j<_n; j++){
-				System.out.print(_board[i][j]);
+				if(_board[i][j] != null){
+					s+=_board[i][j]+" ";
+				}
+				else{
+					s+="* ";
+				}
 			}
-			System.out.println(); // ligne suivante
+			s += "\n";
 		}
+		return s;
 	}
 }
