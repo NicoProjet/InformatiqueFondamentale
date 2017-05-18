@@ -18,6 +18,7 @@ public class Main {
         int choice = parameters[4];
         switch(choice){
         case 0:
+        	System.out.println("T: "+k1+" | F: "+k2+" | C: "+k3);
         	CSP.domination(boardSize, k1, k2, k3);
         	break;
         case 1:

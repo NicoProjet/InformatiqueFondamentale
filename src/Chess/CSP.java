@@ -1,9 +1,7 @@
 package Chess;
 
-//import choco.integer.IntVar;
-//import choco.Problem;
-
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.constraints.Constraint;
 import org.chocosolver.solver.variables.*;
 import java.lang.Math;
 
@@ -13,35 +11,57 @@ public class CSP {
 	
 	static void independance(int boardSize, int k1, int k2, int k3){
 		Model model = new Model("indépendance");
-		//Problem problem = new Problem();
 		BoolVar[] variables = new BoolVar[boardSize*boardSize*boardSize];
 		
 		// add variables
 		CSP.addVariables(boardSize, model, variables);
 		
 		// add constraints
-		// rooks
-		CSP.addIndependanceRook(boardSize, model, variables);
-		// bishops
-		CSP.addIndependanceBishop(boardSize, model, variables);
-		// knights
-		CSP.addIndependanceKnight(boardSize, model, variables);
-		// right amount of each pieces
-		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model);
-		// at most one piece at each position
-		CSP.addUnicityConstraint(boardSize, variables, model);
+		// can be optimized, we found the method Constraint.merge(..) after finishing the independance
+		// we can create a constraint to check if position is empty then us the for loops to merge
+		// with possible threatening pieces
+		CSP.addIndependanceRook(boardSize, model, variables); // rooks
+		CSP.addIndependanceBishop(boardSize, model, variables); // bishops
+		CSP.addIndependanceKnight(boardSize, model, variables); // knights
+		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model); // right amount of each pieces
+		CSP.addUnicityConstraint(boardSize, variables, model); // at most one piece at each position
 		
 		// solve
 		model.getSolver().findSolution();
 
 		// print
 		Board board = CSP.toBoard(model, variables, boardSize);
-		System.out.println(board);
+		if (!board.isEmpty()){
+			System.out.println(board);
+		}
+		else{
+			System.out.println("pas de solution");
+		}
 	}
 	
-	static void domination(int n, int k1, int k2, int k3){
-		Board board = new Board(n);
-		// create choco solver stuff
+	static void domination(int boardSize, int k1, int k2, int k3){
+		System.out.println("domination");
+		Model model = new Model("domination");
+		BoolVar[] variables = new BoolVar[boardSize*boardSize*boardSize];
+		
+		// add variables
+		CSP.addVariables(boardSize, model, variables);		
+		
+		// add constraints
+		CSP.addDomination(boardSize, model, variables);
+		CSP.addUnicityConstraint(boardSize, variables, model);
+		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model);
+		
+		// solve
+		model.getSolver().findSolution();
+		
+		Board board = CSP.toBoard(model, variables, boardSize);
+		if (!board.isEmpty()){
+			System.out.println(board);
+		}
+		else{
+			System.out.println("pas de solution");
+		}
 	}
 	
 	
@@ -74,6 +94,7 @@ public class CSP {
 								for (int v=0; v<pieces.length; v++){
 									// X0 or ( X1 and X2)
 									// used model.and to cast from boolvar to constraint type
+									// there is repetition
 									model.or(model.and(variables[(i*boardSize*boardSize)+j*boardSize+rookPos].not()),
 											model.and(variables[(i*boardSize*boardSize)+l*boardSize+v].not(),
 													variables[(k*boardSize*boardSize)+j*boardSize+v].not())).post();
@@ -122,6 +143,77 @@ public class CSP {
 						}
 					}
 				}
+			}
+		}
+	}
+	
+	static void addDomination(int boardSize, Model model, BoolVar[] variables){
+		// train of thoughts: using model.and() to cast to Constraint type
+		//Constraint c = model.and(model.boolVar()); // always true
+		//c = Constraint.merge("", model.and(variables[0].not())); //  true and ( not var0 )
+		//c = Constraint.merge("", model.and(variables[1].not())); //  true and ( not var0 and not var1)
+		//c.getOpposite().post(); // post ( not true and ( not var0 and not var1 ) )  | Which equals  ( var0 or var1)
+		for (int i = 0; i<boardSize; i++){
+			for (int j = 0; j<boardSize; j++){
+				System.out.println("\n\n ==> pos = ("+i+","+j+")");
+				// System.out.println("\n->  i: "+i+" | j: "+j);
+				Constraint c = model.and(model.boolVar()); // always true
+				// checks if there is a piece (i found it clearer that way than adding a for (i++<3)
+				// but adding more different pieces might change that
+				System.out.println("si T en ("+i+","+j+")");
+				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+rookPos].not()));
+				System.out.println("si F en ("+i+","+j+")");
+				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+bishopPos].not()));
+				System.out.println("si C en ("+i+","+j+")");
+				c = Constraint.merge("", model.and(variables[i*boardSize*boardSize+j*boardSize+knightPos].not()));
+				
+				// c = Constraint.merge("", model.and(model.boolVar().not())); // test ajout ( or true )
+				
+				
+				// threatened by rooks
+				System.out.println("threatened by rooks?:");
+				for (int k = 0; k<boardSize; k++){
+					if(k != i){
+						System.out.println("si T en ("+i+","+k+") et ("+k+","+j+")");
+						// System.out.println("k: "+k); // correct rooks positions
+						c = Constraint.merge("", model.and(variables[(k*boardSize*boardSize)+j*boardSize+rookPos].not()));
+						c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+k*boardSize+rookPos].not()));
+					}
+				}
+				
+				
+				// threatened by bishops
+				System.out.println("threatened by bishops?:");
+				for (int k = 0; k<boardSize; k++){
+					for (int l = 0; l<boardSize; l++){
+						if(i != k && j != l && Math.abs(i-k) == Math.abs(j-l)){
+							// System.out.println("k: "+k+" | l: "+l); // correct bishops positions
+							System.out.println("si F en ("+k+","+l+")");
+							c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+j*boardSize+bishopPos].not()));
+						}
+					}
+				}
+				
+				
+				// threatened by knights
+				System.out.println("threatened by knights?:");
+				int [] kvalues = {i-1,i-2,i+1,i+2};
+				int [] lvalues = {j-1,j-2,j+1,j+2};
+				for (int k : kvalues){
+					if (0<=k && k<boardSize){
+						for (int l : lvalues){
+							if (0<=l && l<boardSize){
+								if (Math.abs(i-k) + Math.abs(j-l) == 3){
+									// System.out.println("k: "+k+" | l: "+l); // correct knights positions
+									System.out.println("si C en ("+k+","+l+")");
+									c = Constraint.merge("", model.and(variables[(i*boardSize*boardSize)+j*boardSize+knightPos].not()));
+								}
+							}
+						}
+					}
+				}
+				
+				c.getOpposite().post();
 			}
 		}
 	}

@@ -3,10 +3,12 @@ package Chess;
 public class Board {
 	private int _n;
 	private ChessPiece[][] _board;
+	private boolean _empty;
 	
 	public Board(int n){
 		_n = n;
 		_board = new ChessPiece[_n][_n];
+		_empty = true;
 	}
 	
 	public void addPiece(ChessPiece p){
@@ -15,6 +17,7 @@ public class Board {
 	
 	public void addPiece(int x, int y, ChessPiece p){
 		_board[x][y] = p;
+		_empty = false;
 	}
 	
 	public String toString(){
@@ -31,5 +34,9 @@ public class Board {
 			s += "\n";
 		}
 		return s;
+	}
+	
+	public boolean isEmpty(){
+		return _empty;
 	}
 }
