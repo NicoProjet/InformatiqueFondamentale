@@ -4,7 +4,6 @@ package Chess;
 //import choco.Problem;
 
 import org.chocosolver.solver.Model;
-import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.*;
 import java.lang.Math;
 
@@ -33,14 +32,9 @@ public class CSP {
 		CSP.addUnicityConstraint(boardSize, variables, model);
 		
 		// solve
-		Solution solution = model.getSolver().findSolution();
-		
+		model.getSolver().findSolution();
+
 		// print
-		/*
-		if(solution != null){
-			System.out.println(solution.toString());
-		}
-		*/
 		Board board = CSP.toBoard(model, variables, boardSize);
 		System.out.println(board);
 	}
@@ -115,9 +109,9 @@ public class CSP {
 				int [] kvalues = {i-1,i-2,i+1,i+2};
 				int [] lvalues = {j-1,j-2,j+1,j+2};
 				for (int k : kvalues){
-					if (0<k && k<boardSize){
+					if (0<=k && k<boardSize){
 						for (int l : lvalues){
-							if (0<l && l<boardSize){
+							if (0<=l && l<boardSize){
 								if (Math.abs(i-k) + Math.abs(j-l) == 3){
 									for (int v=0; v<pieces.length; v++){
 										model.or(variables[(i*boardSize*boardSize)+j*boardSize+knightPos].not(),
