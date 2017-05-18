@@ -14,12 +14,6 @@ public class Bishop extends ChessPiece {
 	}
 
 	@Override
-	public void drawTargets(Board board) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public String toString() {
 		return ""+_v;
 	}

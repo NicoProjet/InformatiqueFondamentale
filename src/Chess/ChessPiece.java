@@ -9,5 +9,4 @@ public abstract class ChessPiece {
 	
 	public abstract void addToBoard(Board board);
 	public abstract String toString();
-	public abstract void drawTargets(Board board);
 }

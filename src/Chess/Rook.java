@@ -12,12 +12,6 @@ public class Rook extends ChessPiece {
 	public void addToBoard(Board board) {
 		board.addPiece(_x,_y,this);
 	}
-
-	@Override
-	public void drawTargets(Board board) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	@Override
 	public String toString() {
