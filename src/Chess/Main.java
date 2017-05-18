@@ -15,7 +15,15 @@ public class Main {
         int k1 = parameters[1];
         int k2 = parameters[2];
         int k3 = parameters[3];
-        CSP.independance(boardSize, k1, k2, k3);
+        int choice = parameters[4];
+        switch(choice){
+        case 0:
+        	CSP.domination(boardSize, k1, k2, k3);
+        	break;
+        case 1:
+        	CSP.independance(boardSize, k1, k2, k3);
+        	break;
+        }
 	}
 
 	public static int[] parser(String[] parameters) {
