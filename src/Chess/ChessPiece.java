@@ -1,11 +1,12 @@
 package Chess;
 
 public abstract class ChessPiece {
-	private int _x,_y;
+	protected int _x;
+	protected int _y;
 	
 	public int getX(){return _x;}
 	public int getY(){return _y;}
 	
-	abstract void draw();
-	abstract void drawTargets();
+	abstract void draw(Board board);
+	abstract void drawTargets(Board board);
 }
