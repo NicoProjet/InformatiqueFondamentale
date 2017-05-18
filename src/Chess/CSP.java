@@ -2,8 +2,10 @@ package Chess;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.constraints.Constraint;
+import org.chocosolver.solver.constraints.Propagator;
 import org.chocosolver.solver.variables.*;
 import java.lang.Math;
+import java.util.ArrayList;
 
 public class CSP {
 	static final int rookPos = 0, bishopPos = 1, knightPos = 2;
@@ -155,6 +157,66 @@ public class CSP {
 		//c.getOpposite().post(); // post ( not true and ( not var0 and not var1 ) )  | Which equals  ( var0 or var1)
 		for (int i = 0; i<boardSize; i++){
 			for (int j = 0; j<boardSize; j++){
+				ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
+				terms.add(variables[i*boardSize*boardSize+j*boardSize+rookPos]);
+				terms.add(variables[i*boardSize*boardSize+j*boardSize+bishopPos]);
+				terms.add(variables[i*boardSize*boardSize+j*boardSize+knightPos]);
+								
+				// threatened by rooks
+				for (int k = 0; k<boardSize; k++){
+					if(k != i){
+						terms.add(variables[(k*boardSize*boardSize)+j*boardSize+rookPos]);
+						terms.add(variables[(i*boardSize*boardSize)+k*boardSize+rookPos]);
+					}
+				}
+				
+				
+				// threatened by bishops
+				for (int k = 0; k<boardSize; k++){
+					for (int l = 0; l<boardSize; l++){
+						if(i != k && j != l && Math.abs(i-k) == Math.abs(j-l)){
+							terms.add(variables[(i*boardSize*boardSize)+j*boardSize+bishopPos]);
+						}
+					}
+				}
+				
+				
+				// threatened by knights
+				int [] kvalues = {i-1,i-2,i+1,i+2};
+				int [] lvalues = {j-1,j-2,j+1,j+2};
+				for (int k : kvalues){
+					if (0<=k && k<boardSize){
+						for (int l : lvalues){
+							if (0<=l && l<boardSize){
+								if (Math.abs(i-k) + Math.abs(j-l) == 3){
+									terms.add(variables[(i*boardSize*boardSize)+j*boardSize+knightPos]);
+								}
+							}
+						}
+					}
+				}
+				
+				// cast ArrayList<BoolVar> to BoolVar[]
+				BoolVar[] termsArray = new BoolVar[terms.size()];
+				for (int index = 0; index < terms.size(); index++){
+					termsArray[index] = terms.get(index).not();
+				}
+				
+				// post constraint
+				model.and(termsArray).getOpposite().post();
+			}
+		}
+	}
+	
+	/*
+	static void addDomination(int boardSize, Model model, BoolVar[] variables){
+		// train of thoughts: using model.and() to cast to Constraint type
+		//Constraint c = model.and(model.boolVar()); // always true
+		//c = Constraint.merge("", model.and(variables[0].not())); //  true and ( not var0 )
+		//c = Constraint.merge("", model.and(variables[1].not())); //  true and ( not var0 and not var1)
+		//c.getOpposite().post(); // post ( not true and ( not var0 and not var1 ) )  | Which equals  ( var0 or var1)
+		for (int i = 0; i<boardSize; i++){
+			for (int j = 0; j<boardSize; j++){
 				System.out.println("\n\n ==> pos = ("+i+","+j+")");
 				// System.out.println("\n->  i: "+i+" | j: "+j);
 				//Constraint c = model.and(model.boolVar()); // always true
@@ -170,7 +232,6 @@ public class CSP {
 				
 				// c = Constraint.merge("", model.and(model.boolVar().not()),c.getOpposite()); // test ajout ( or true )
 				
-				/*
 				// threatened by rooks
 				System.out.println("threatened by rooks?:");
 				for (int k = 0; k<boardSize; k++){
@@ -213,11 +274,10 @@ public class CSP {
 						}
 					}
 				}
-				*/
 				c.getOpposite().post();
 			}
 		}
-	}
+	}*/
 	
 	static void addConstraintPiecesCounters(int boardSize, int k1, int k2, int k3, BoolVar[] variables, Model model){
 		BoolVar[] rooks = new BoolVar[boardSize*boardSize], bishops = new BoolVar[boardSize*boardSize], knights = new BoolVar[boardSize*boardSize];
