@@ -3,7 +3,7 @@ package Chess;
 public class Bishop extends ChessPiece {
 
 	@Override
-	void draw() {
+	void draw(Board board) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -6,6 +6,6 @@ public abstract class ChessPiece {
 	public int getX(){return _x;}
 	public int getY(){return _y;}
 	
-	abstract void draw();
+	abstract void draw(Board board);
 	abstract void drawTargets();
 }
