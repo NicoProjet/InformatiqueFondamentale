@@ -1,7 +1,5 @@
 package Chess;
 
-import java.util.ArrayList;
-
 public class Board {
 	private int _n;
 	private char[][] _board;
