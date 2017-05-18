@@ -4,6 +4,7 @@ package Chess;
 //import choco.Problem;
 
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.*;
 import java.lang.Math;
 
@@ -14,7 +15,7 @@ public interface CSP {
 	static void independance(int boardSize, int k1, int k2, int k3){
 		Model model = new Model("indépendance");
 		//Problem problem = new Problem();
-		BoolVar[] variables = new BoolVar[boardSize*boardSize];
+		BoolVar[] variables = new BoolVar[boardSize*boardSize*boardSize];
 		
 		// add variables
 		CSP.addVariables(boardSize, model, variables);
@@ -27,6 +28,12 @@ public interface CSP {
 		// knights
 		CSP.addIndependanceKnight(boardSize, model, variables);
 		CSP.addConstraintPiecesCounters(boardSize, k1, k2, k3, variables, model);
+		
+		// solve
+		Solution solution = model.getSolver().findSolution();
+		if(solution != null){
+			System.out.println(solution.toString());
+		}
 		
 		// print
 		//Board board = new Board(boardSize);

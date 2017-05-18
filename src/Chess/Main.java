@@ -11,13 +11,16 @@ public class Main {
         int[] parameters;
 
         parameters = parser(args);
-
-
+        int boardSize = parameters[0];
+        int k1 = parameters[1];
+        int k2 = parameters[2];
+        int k3 = parameters[3];
+        CSP.independance(boardSize, k1, k2, k3);
 	}
 
 	public static int[] parser(String[] parameters) {
         //domination = 0    independance = 1
-        int[] result = new int[5]; //0=chessSize, 1=bischop, 2=knight, 3=rook, 4=csp
+        int[] result = new int[5]; //0=chessSize, 1=rook, 2=bischop, 3=knight, 4=csp
         int index = 0;
 
 	    while (index < parameters.length) {
@@ -31,15 +34,15 @@ public class Main {
             }
             else if (parameters[index].equals("-f")) {
                 ++index;
-                result[1] = Integer.parseInt(parameters[index]);
+                result[2] = Integer.parseInt(parameters[index]);
             }
             else if (parameters[index].equals("-c")) {
                 ++index;
-                result[2] = Integer.parseInt(parameters[index]);
+                result[3] = Integer.parseInt(parameters[index]);
             }
             else if (parameters[index].equals("-t")) {
                 ++index;
-                result[3] = Integer.parseInt(parameters[index]);
+                result[1] = Integer.parseInt(parameters[index]);
             }
             ++index;
         }
