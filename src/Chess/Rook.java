@@ -1,7 +1,7 @@
 package Chess;
 
 public class Rook extends ChessPiece {
-	static private char _v = 'R';
+	static private char _v = 'T';
 
 	@Override
 	void draw(Board board) {
@@ -9,7 +9,7 @@ public class Rook extends ChessPiece {
 	}
 
 	@Override
-	void drawTargets() {
+	void drawTargets(Board board) {
 		// TODO Auto-generated method stub
 		
 	}

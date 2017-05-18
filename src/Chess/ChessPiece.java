@@ -8,5 +8,5 @@ public abstract class ChessPiece {
 	public int getY(){return _y;}
 	
 	abstract void draw(Board board);
-	abstract void drawTargets();
+	abstract void drawTargets(Board board);
 }
