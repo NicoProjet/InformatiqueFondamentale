@@ -1,7 +1,6 @@
 package museum;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class WatchMuseum {
 
@@ -14,5 +13,7 @@ public class WatchMuseum {
 		else{
 			map = Parser.parse("map.txt");
 		}
+
+		for(String elem: map) System.out.println(elem);
 	}
 }
