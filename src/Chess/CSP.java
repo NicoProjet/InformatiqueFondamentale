@@ -1,8 +1,7 @@
 package Chess;
 
 import org.chocosolver.solver.Model;
-import org.chocosolver.solver.constraints.Constraint;
-import org.chocosolver.solver.constraints.Propagator;
+import org.chocosolver.solver.Solution;
 import org.chocosolver.solver.variables.*;
 import java.lang.Math;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ public class CSP {
 	
 	static void independance(int boardSize, int k1, int k2, int k3){
 		Model model = new Model("indépendance");
-		BoolVar[] variables = new BoolVar[boardSize*boardSize*boardSize];
+		BoolVar[] variables = new BoolVar[boardSize*boardSize*pieces.length];
 		
 		// add variables
 		CSP.addVariables(boardSize, model, variables);
@@ -33,21 +32,16 @@ public class CSP {
 
 		// print
 		Board board = CSP.toBoard(model, variables, boardSize);
-		if (!board.isEmpty()){
-			System.out.println(board);
-		}
-		else{
-			System.out.println("pas de solution");
-		}
+		CSP.print(board);
 	}
 	
 	static void domination(int boardSize, int k1, int k2, int k3){
 		System.out.println("domination");
 		Model model = new Model("domination");
-		BoolVar[] variables = new BoolVar[boardSize*boardSize*boardSize];
+		BoolVar[] variables = new BoolVar[boardSize*boardSize*pieces.length];
 		
 		// add variables
-		CSP.addVariables(boardSize, model, variables);		
+		CSP.addVariables(boardSize, model, variables);
 		
 		// add constraints
 		CSP.addDomination(boardSize, model, variables);
@@ -57,15 +51,35 @@ public class CSP {
 		// solve
 		model.getSolver().findSolution();
 		
+		//print
 		Board board = CSP.toBoard(model, variables, boardSize);
-		if (!board.isEmpty()){
-			System.out.println(board);
-		}
-		else{
-			System.out.println("pas de solution");
-		}
+		CSP.print(board);
 	}
 	
+	static void minimizeKnights(int boardSize){
+		System.out.println("minimisation du nombre de cavalier pour obtenir une domination");
+		Model model = new Model("minKnights");
+		BoolVar[] variables = new BoolVar[boardSize*boardSize];
+		
+		// add variables
+		for (int i=0; i<boardSize; i++){
+			for (int j=0; j<boardSize; j++){
+				variables[(i*boardSize)+j] = model.boolVar("X_"+i+"_"+j);
+			}
+		}
+		IntVar tot_knights = model.intVar("tot_knights", 0, boardSize*boardSize);
+		
+		// add constraints
+		CSP.addDominationOnlyByKnights(boardSize, model, variables);
+		model.sum(variables, "=", tot_knights).post();
+		
+		// solve
+		//model.getSolver().findSolution();
+		Solution sol = model.getSolver().findOptimalSolution(tot_knights, false);
+		
+		Board board = CSP.toBoardKnightsOnly(sol, variables, boardSize);
+		CSP.print(board);
+	}
 	
 	static void addVariables(int boardSize, Model model, BoolVar[] variables){
 		String v = "";
@@ -175,7 +189,7 @@ public class CSP {
 				for (int k = 0; k<boardSize; k++){
 					for (int l = 0; l<boardSize; l++){
 						if(i != k && j != l && Math.abs(i-k) == Math.abs(j-l)){
-							terms.add(variables[(i*boardSize*boardSize)+j*boardSize+bishopPos]);
+							terms.add(variables[(k*boardSize*boardSize)+l*boardSize+bishopPos]);
 						}
 					}
 				}
@@ -189,7 +203,40 @@ public class CSP {
 						for (int l : lvalues){
 							if (0<=l && l<boardSize){
 								if (Math.abs(i-k) + Math.abs(j-l) == 3){
-									terms.add(variables[(i*boardSize*boardSize)+j*boardSize+knightPos]);
+									terms.add(variables[(k*boardSize*boardSize)+l*boardSize+knightPos]);
+								}
+							}
+						}
+					}
+				}
+				
+				// cast ArrayList<BoolVar> to BoolVar[]
+				BoolVar[] termsArray = new BoolVar[terms.size()];
+				for (int index = 0; index < terms.size(); index++){
+					termsArray[index] = terms.get(index).not();
+				}
+				
+				// post constraint
+				model.and(termsArray).getOpposite().post();
+			}
+		}
+	}
+	
+	static void addDominationOnlyByKnights(int boardSize, Model model, BoolVar[] variables){
+		for (int i = 0; i<boardSize; i++){
+			for (int j = 0; j<boardSize; j++){
+				ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
+				terms.add(variables[i*boardSize+j]);
+		
+				// threatened by knights
+				int [] kvalues = {i-1,i-2,i+1,i+2};
+				int [] lvalues = {j-1,j-2,j+1,j+2};
+				for (int k : kvalues){
+					if (0<=k && k<boardSize){
+						for (int l : lvalues){
+							if (0<=l && l<boardSize){
+								if (Math.abs(i-k) + Math.abs(j-l) == 3){
+									terms.add(variables[(k*boardSize)+l]);
 								}
 							}
 						}
@@ -259,6 +306,18 @@ public class CSP {
 		return board;
 	}
 	
+	static Board toBoardKnightsOnly(Solution s, IntVar[] variables, int boardSize){
+		Board board = new Board(boardSize);
+		for (int i = 0; i < boardSize; i++){
+			for (int j = 0; j<boardSize; j++){
+				if (s.getIntVal(variables[i*boardSize+j]) == 1){
+					board.addPiece(i,j,new Knight(i,j));
+				}
+			}
+		}
+		return board;
+	}
+	
 	static IntVar getX(IntVar[] variables, int boardSize, int i, int j, char v){
 		int valueIndex = 0;
 		for (int k = 1; k<pieces.length; k++){
@@ -267,6 +326,15 @@ public class CSP {
 			}
 		}
 		return variables[(i*boardSize*boardSize)+j*boardSize+valueIndex];
+	}
+	
+	static void print(Board board){
+		if (!board.isEmpty()){
+			System.out.println(board);
+		}
+		else{
+			System.out.println("pas de solution");
+		}
 	}
 
 }
