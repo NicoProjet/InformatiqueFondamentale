@@ -8,7 +8,7 @@ public class WatchMuseum {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		ArrayList<String> map;
-		if (args[0] != null){
+		if (args.length > 0){
 			map = Parser.parse(args[0]);
 		}
 		else{
