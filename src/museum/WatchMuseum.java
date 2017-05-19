@@ -7,7 +7,7 @@ public class WatchMuseum {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ArrayList<String> map = Parser.parse(args[1]);
+		ArrayList<String> map = Parser.parse(args[0]);
 
 	}
 

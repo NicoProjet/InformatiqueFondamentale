@@ -7,16 +7,16 @@ import java.util.ArrayList;
 
 public class Parser {
 
-    static public ArrayList<String> parse(String file) throws IOException {
+    static public ArrayList<String> parse(String file){
+        System.out.println(file);
         BufferedReader in = null;
         ArrayList<String> map = new ArrayList<String>();
         String currentLine;
         try {
             in = new BufferedReader(new FileReader(file));
             while((currentLine = in.readLine()) != null) map.add(currentLine);
-        }finally {
-            if(in != null) in.close();
-
+        }catch(IOException e){
+            System.err.println(e);
         }
         return map;
     }
