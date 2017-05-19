@@ -165,10 +165,9 @@ public class CSP {
 	
 	static void addDomination(int boardSize, Model model, BoolVar[] variables){
 		// train of thoughts: using model.and() to cast to Constraint type
-		//Constraint c = model.and(model.boolVar()); // always true
-		//c = Constraint.merge("", model.and(variables[0].not())); //  true and ( not var0 )
-		//c = Constraint.merge("", model.and(variables[1].not())); //  true and ( not var0 and not var1)
-		//c.getOpposite().post(); // post ( not true and ( not var0 and not var1 ) )  | Which equals  ( var0 or var1)
+		// ( not var0 )
+		// ( not var0 and not var1)
+		// Which equals  ( var0 or var1)
 		for (int i = 0; i<boardSize; i++){
 			for (int j = 0; j<boardSize; j++){
 				ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
