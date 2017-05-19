@@ -75,7 +75,7 @@ public class CSP {
 		
 		// solve
 		//model.getSolver().findSolution();
-		Solution sol = model.getSolver().findOptimalSolution(tot_knights, false);
+		Solution sol = model.getSolver().findOptimalSolution(tot_knights, Model.MINIMIZE);
 		
 		Board board = CSP.toBoardKnightsOnly(sol, variables, boardSize);
 		CSP.print(board);
