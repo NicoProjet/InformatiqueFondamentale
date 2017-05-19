@@ -22,14 +22,7 @@ public class CSP {
 		
 		// add constraints
 		System.out.println("add domination");
-		//CSP.addDominationCameras(museum, model, variables); // all positions have a camera or are watched by a camera
-		
-		
-		// ----------------
-		Constraint[] cons;
-		// ----------------
-		
-		
+		CSP.addDominationCameras(museum, model, variables); // all positions have a camera or are watched by a camera		
 		System.out.println("add unicity");
 		CSP.addUnicityConstraint(museum, model, variables); // only one item per position
 		System.out.println("add walls");
@@ -69,7 +62,7 @@ public class CSP {
 							terms.add(variables[k*D1 + j*D2 + orientation]);
 							// check if no walls between them = WB
 							for (int m=k+1; m<i; m++){
-								terms.add(variables[m*D1 + j*D2 + orientation]);
+								terms.add(variables[m*D1 + j*D2].not());
 							}
 							// Adds ( CD AND WB ) to constraints_OR_0
 							//System.out.println(terms.size());
@@ -81,8 +74,8 @@ public class CSP {
 							orientation = NORTH_INDEX; // starting other side of room
 							terms.add(variables[k*D1 + j*D2 + orientation]);
 							// check if no walls between them
-							for (int n=k+1; n<museum._length; n++){
-								terms.add(variables[n*D1 + j*D2 + orientation]);
+							for (int n=k-1; n>i; n--){
+								terms.add(variables[n*D1 + j*D2].not());
 							}
 							BoolVar[] termsArray = CSP.toArray(terms);
 							constraints_OR.add(model.and(termsArray));
@@ -96,10 +89,10 @@ public class CSP {
 							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
 							orientation = SOUTH_INDEX;
 							// check if camera right direction = CD
-							terms.add(variables[i*D1 + k*D2 + orientation]);
+							terms.add(variables[i*D1 + k*D2].not());
 							// check if no walls between them = WB
 							for (int m=k+1; m<j; m++){
-								terms.add(variables[i*D1 + m*D2 + orientation]);
+								terms.add(variables[i*D1 + m*D2].not());
 							}
 							// Adds ( CD AND WB ) to constraints_OR_0
 							BoolVar[] termsArray = CSP.toArray(terms);
@@ -110,7 +103,7 @@ public class CSP {
 							orientation = NORTH_INDEX; // starting other side of room
 							terms.add(variables[i*D1 + k*D2 + orientation]);
 							// check if no walls between them
-							for (int n=k+1; n<museum._width; n++){
+							for (int n=k-1; n>j; n--){
 								terms.add(variables[i*D1 + n*D2 + orientation]);
 							}
 							BoolVar[] termsArray = CSP.toArray(terms);
@@ -134,6 +127,26 @@ public class CSP {
 				*/
 				c = c.getOpposite();
 				c.post();
+			}
+		}
+	}
+	
+	public static void addNotWallsBetween(int x, int x_bound, int y, int y_bound, Museum museum, ArrayList<BoolVar> list, BoolVar[] variables){
+		int D1 = museum._width*possibleObjects.length; // simulated first dimension
+		int D2 = possibleObjects.length; // simulated second dimension
+		if (x > x_bound){
+			int tmp = x;
+			x = x_bound;
+			x_bound = tmp;
+		}
+		if (y > y_bound){
+			int tmp = y;
+			y = y_bound;
+			y_bound = tmp;
+		}
+		for (int i = x; i<x_bound; i++){
+			for (int j = y; j<y_bound; j++){
+				list.add(variables[i*D1 + j*D2].not());
 			}
 		}
 	}
@@ -183,7 +196,7 @@ public class CSP {
 	private static BoolVar[] toArray(ArrayList<BoolVar> arrayList){
 		BoolVar[] termsArray = new BoolVar[arrayList.size()];
 		for (int index = 0; index < arrayList.size(); index++){
-			termsArray[index] = arrayList.get(index).not();
+			termsArray[index] = arrayList.get(index);
 		}
 		return termsArray;
 	}
