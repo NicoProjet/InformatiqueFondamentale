@@ -41,9 +41,7 @@ public class CSP {
 		BoolVar[] variables = new BoolVar[boardSize*boardSize*pieces.length];
 		
 		// add variables
-		System.out.println("test");
 		CSP.addVariables(boardSize, model, variables);
-		System.out.println("test");
 		
 		// add constraints
 		CSP.addDomination(boardSize, model, variables);
