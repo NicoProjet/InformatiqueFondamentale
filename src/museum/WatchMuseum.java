@@ -14,7 +14,5 @@ public class WatchMuseum {
 		else{
 			map = Parser.parse("map.txt");
 		}
-		
 	}
-
 }
