@@ -34,7 +34,7 @@ public class Museum {
 					s+=_museum[i][j]+" ";
 				}
 				else{
-					s+=" ";
+					s+="  ";
 				}
 			}
 			s += "\n";

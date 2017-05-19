@@ -25,7 +25,9 @@ public class Parser {
         Museum museum = new Museum(length, width);
         for (int i=0; i<length; i++){
         	for (int j=0; j<width; j++){
-        		museum.addObstacle(i, j, new Obstacle(i,j));
+        		if(map.get(i).charAt(j) == '*'){
+        			museum.addObstacle(i, j, new Obstacle(i,j));
+        		}
         	}
         }
         return museum;
