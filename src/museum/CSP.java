@@ -9,7 +9,7 @@ import org.chocosolver.solver.variables.*;
 
 public class CSP {
 	static final char[] possibleObjects = {'O','E','S','W','N'};
-	static final int EST_INDEX = 1, WEST_INDEX = 3, NORTH_INDEX = 4, SOUTH_INDEX = 2;
+	static final int EAST_INDEX = 1, WEST_INDEX = 3, NORTH_INDEX = 4, SOUTH_INDEX = 2;
 	static final int ojectPos = 0, EPos = 1, SPos = 2, WPos = 3, NPos = 4;
 	
 	static void minimizeCameras(Museum museum){
@@ -28,7 +28,7 @@ public class CSP {
 		System.out.println("add walls");
 		CSP.addWalls(museum, model, variables);
 		System.out.println("add somme");
-		//model.sum(variables, "=", tot_cameras).post(); // tot_cameras = sum(all cameras)
+		model.sum(variables, "=", tot_cameras).post(); // tot_cameras = sum(all cameras)
 		
 		// solve
 		System.out.println("solve");
@@ -58,24 +58,23 @@ public class CSP {
 						if (k < i){
 							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
 							orientation = SOUTH_INDEX;
-							// check if camera right direction = CD
-							terms.add(variables[k*D1 + j*D2 + orientation]);
-							// check if no walls between them = WB
-							for (int m=k+1; m<i; m++){
-								terms.add(variables[m*D1 + j*D2].not());
+							terms.add(variables[k*D1 + j*D2 + orientation]); // check if camera right direction = CD
+							for (int m=k+1; m<i; m++){ // check if no walls between them = WB
+								for (int v = 0; v<possibleObjects.length; v++){
+									terms.add(variables[m*D1 + j*D2 + v].not());
+								}
 							}
-							// Adds ( CD AND WB ) to constraints_OR_0
-							//System.out.println(terms.size());
 							BoolVar[] termsArray = CSP.toArray(terms);
-							constraints_OR.add(model.and(termsArray));
+							constraints_OR.add(model.and(termsArray)); // Adds ( CD AND WB ) to constraints_OR_0
 						}
 						else{
 							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = NORTH_INDEX; // starting other side of room
+							orientation = NORTH_INDEX;
 							terms.add(variables[k*D1 + j*D2 + orientation]);
-							// check if no walls between them
 							for (int n=k-1; n>i; n--){
-								terms.add(variables[n*D1 + j*D2].not());
+								for (int v = 0; v<possibleObjects.length; v++){
+									terms.add(variables[n*D1 + j*D2 + v].not());
+								}
 							}
 							BoolVar[] termsArray = CSP.toArray(terms);
 							constraints_OR.add(model.and(termsArray));
@@ -87,24 +86,24 @@ public class CSP {
 					if (k != j){
 						if (k < j){
 							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = SOUTH_INDEX;
-							// check if camera right direction = CD
+							orientation = EAST_INDEX;
 							terms.add(variables[i*D1 + k*D2].not());
-							// check if no walls between them = WB
 							for (int m=k+1; m<j; m++){
-								terms.add(variables[i*D1 + m*D2].not());
+								for (int v = 0; v<possibleObjects.length; v++){
+									terms.add(variables[i*D1 + m*D2 + v].not());
+								}
 							}
-							// Adds ( CD AND WB ) to constraints_OR_0
 							BoolVar[] termsArray = CSP.toArray(terms);
 							constraints_OR.add(model.and(termsArray));
 						}
 						else{
 							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = NORTH_INDEX; // starting other side of room
+							orientation = WEST_INDEX;
 							terms.add(variables[i*D1 + k*D2 + orientation]);
-							// check if no walls between them
 							for (int n=k-1; n>j; n--){
-								terms.add(variables[i*D1 + n*D2 + orientation]);
+								for (int v = 0; v<possibleObjects.length; v++){
+									terms.add(variables[i*D1 + n*D2 + v].not());
+								}
 							}
 							BoolVar[] termsArray = CSP.toArray(terms);
 							constraints_OR.add(model.and(termsArray));
@@ -118,13 +117,7 @@ public class CSP {
 				for (int index = 0; index <constraints_OR.size(); index ++){
 					cs[index] = constraints_OR.get(index).getOpposite();
 				}
-				Constraint c = Constraint.merge(" ", cs);
-				/*
-				Constraint c = constraints_OR.get(0).getOpposite(); // ( A OR B) = not ( not A AND not B )
-				for (int index = 1; index<constraints_OR.size(); index++){
-					c = Constraint.merge("", constraints_OR.get(index).getOpposite(),c);
-				}
-				*/
+				Constraint c = Constraint.merge("", cs);
 				c = c.getOpposite();
 				c.post();
 			}
