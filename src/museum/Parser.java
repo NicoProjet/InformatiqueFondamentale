@@ -26,7 +26,12 @@ public class Parser {
         for (int i=0; i<length; i++){
         	for (int j=0; j<width; j++){
         		if(map.get(i).charAt(j) == '*'){
-        			museum.addObstacle(i, j, new Obstacle(i,j));
+        			if (length<width){
+        				museum.addObstacle(j, i, new Obstacle(j,i));
+        			}
+        			else{
+        				museum.addObstacle(i, j, new Obstacle(i,j));
+        			}
         		}
         	}
         }

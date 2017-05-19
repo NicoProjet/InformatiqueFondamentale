@@ -6,9 +6,9 @@ public class Museum {
 	private MuseumObject[][] _museum;
 	private int _numberOfObjects;
 	
-	public Museum(int length, int width){
-		_length = length;
-		_width = width;
+	public Museum(int x, int y){
+		_length = Math.max(x, y);
+		_width = Math.min(x, y);
 		_museum = new MuseumObject[_length][_width];
 		_numberOfObjects = 0;
 	}
@@ -40,6 +40,14 @@ public class Museum {
 			s += "\n";
 		}
 		return s;
+	}
+	
+	public MuseumObject getObject(int x, int y){
+		return _museum[x][y];
+	}
+	
+	public char getValue(int x, int y){
+		return _museum[x][y].getValue();
 	}
 
 }

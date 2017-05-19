@@ -1,13 +1,8 @@
 package Chess;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
-import java.util.List;
-
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
         int[] parameters;
 
         parameters = parser(args);

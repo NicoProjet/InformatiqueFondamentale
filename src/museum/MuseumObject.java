@@ -9,5 +9,6 @@ public abstract class MuseumObject {
 	
 	public abstract void addToMuseum(Museum museum);
 	public abstract String toString();
+	public abstract char getValue();
 
 }

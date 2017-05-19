@@ -177,9 +177,15 @@ public class CSP {
 				terms.add(variables[i*boardSize*pieces.length+j*pieces.length+knightPos]);
 								
 				// threatened by rooks
+				// same line
 				for (int k = 0; k<boardSize; k++){
 					if(k != i){
 						terms.add(variables[(k*boardSize*pieces.length)+j*pieces.length+rookPos]);
+					}
+				}
+				// same column
+				for (int k = 0; k<boardSize; k++){
+					if(k != j){
 						terms.add(variables[(i*boardSize*pieces.length)+k*pieces.length+rookPos]);
 					}
 				}

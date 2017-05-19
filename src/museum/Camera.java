@@ -28,4 +28,9 @@ public class Camera extends MuseumObject {
 		return ""+_value;
 	}
 
+	@Override
+	public char getValue() {
+		return _value;
+	}
+
 }
