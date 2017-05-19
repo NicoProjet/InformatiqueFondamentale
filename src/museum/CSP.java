@@ -123,26 +123,6 @@ public class CSP {
 		}
 	}
 	
-	public static void addNotWallsBetween(int x, int x_bound, int y, int y_bound, Museum museum, ArrayList<BoolVar> list, BoolVar[] variables){
-		int D1 = museum._width*possibleObjects.length; // simulated first dimension
-		int D2 = possibleObjects.length; // simulated second dimension
-		if (x > x_bound){
-			int tmp = x;
-			x = x_bound;
-			x_bound = tmp;
-		}
-		if (y > y_bound){
-			int tmp = y;
-			y = y_bound;
-			y_bound = tmp;
-		}
-		for (int i = x; i<x_bound; i++){
-			for (int j = y; j<y_bound; j++){
-				list.add(variables[i*D1 + j*D2].not());
-			}
-		}
-	}
-	
 	private static void addWalls(Museum museum, Model model, BoolVar[] variables){
 		int D1 = museum._width*possibleObjects.length; // simulated first dimension
 		int D2 = possibleObjects.length; // simulated second dimension
