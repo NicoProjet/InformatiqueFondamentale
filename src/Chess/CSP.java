@@ -41,7 +41,9 @@ public class CSP {
 		BoolVar[] variables = new BoolVar[boardSize*boardSize*pieces.length];
 		
 		// add variables
+		System.out.println("test");
 		CSP.addVariables(boardSize, model, variables);
+		System.out.println("test");
 		
 		// add constraints
 		CSP.addDomination(boardSize, model, variables);
@@ -85,7 +87,7 @@ public class CSP {
 		String v = "";
 		for (int i=0; i<boardSize; i++){
 			for (int j=0; j<boardSize; j++){
-				for (int k=0; k<3; k++){
+				for (int k=0; k<pieces.length; k++){
 					switch(k){
 						case 0: v = "T";
 							break;
@@ -94,7 +96,7 @@ public class CSP {
 						case 2: v = "C";
 							break;
 					}
-					variables[(i*boardSize*boardSize)+j*boardSize+k] = model.boolVar("X_"+i+"_"+j+"_"+v);
+					variables[(i*boardSize*pieces.length)+j*pieces.length+k] = model.boolVar("X_"+i+"_"+j+"_"+v);
 				}
 			}
 		}
@@ -111,9 +113,9 @@ public class CSP {
 									// X0 or ( X1 and X2)
 									// used model.and to cast from boolvar to constraint type
 									// there is repetition
-									model.or(model.and(variables[(i*boardSize*boardSize)+j*boardSize+rookPos].not()),
-											model.and(variables[(i*boardSize*boardSize)+l*boardSize+v].not(),
-													variables[(k*boardSize*boardSize)+j*boardSize+v].not())).post();
+									model.or(model.and(variables[(i*boardSize*pieces.length)+j*pieces.length+rookPos].not()),
+											model.and(variables[(i*boardSize*pieces.length)+l*pieces.length+v].not(),
+													variables[(k*boardSize*pieces.length)+j*pieces.length+v].not())).post();
 								}
 							}
 						}
@@ -130,8 +132,8 @@ public class CSP {
 					for (int l = 0; l<boardSize; l++){
 						if(i != k && j != l && Math.abs(i-k) == Math.abs(j-l)){
 							for (int v=0; v<pieces.length; v++){
-								model.or(variables[(i*boardSize*boardSize)+j*boardSize+bishopPos].not(),
-										variables[(k*boardSize*boardSize)+l*boardSize+v].not()).post();
+								model.or(variables[(i*boardSize*pieces.length)+j*pieces.length+bishopPos].not(),
+										variables[(k*boardSize*pieces.length)+l*pieces.length+v].not()).post();
 							}
 						}
 					}
@@ -151,8 +153,8 @@ public class CSP {
 							if (0<=l && l<boardSize){
 								if (Math.abs(i-k) + Math.abs(j-l) == 3){
 									for (int v=0; v<pieces.length; v++){
-										model.or(variables[(i*boardSize*boardSize)+j*boardSize+knightPos].not(),
-												variables[(k*boardSize*boardSize)+l*boardSize+v].not()).post();
+										model.or(variables[(i*boardSize*pieces.length)+j*pieces.length+knightPos].not(),
+												variables[(k*boardSize*pieces.length)+l*pieces.length+v].not()).post();
 									}
 								}
 							}
@@ -172,15 +174,15 @@ public class CSP {
 		for (int i = 0; i<boardSize; i++){
 			for (int j = 0; j<boardSize; j++){
 				ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-				terms.add(variables[i*boardSize*boardSize+j*boardSize+rookPos]);
-				terms.add(variables[i*boardSize*boardSize+j*boardSize+bishopPos]);
-				terms.add(variables[i*boardSize*boardSize+j*boardSize+knightPos]);
+				terms.add(variables[i*boardSize*pieces.length+j*pieces.length+rookPos]);
+				terms.add(variables[i*boardSize*pieces.length+j*pieces.length+bishopPos]);
+				terms.add(variables[i*boardSize*pieces.length+j*pieces.length+knightPos]);
 								
 				// threatened by rooks
 				for (int k = 0; k<boardSize; k++){
 					if(k != i){
-						terms.add(variables[(k*boardSize*boardSize)+j*boardSize+rookPos]);
-						terms.add(variables[(i*boardSize*boardSize)+k*boardSize+rookPos]);
+						terms.add(variables[(k*boardSize*pieces.length)+j*pieces.length+rookPos]);
+						terms.add(variables[(i*boardSize*pieces.length)+k*pieces.length+rookPos]);
 					}
 				}
 				
@@ -189,7 +191,7 @@ public class CSP {
 				for (int k = 0; k<boardSize; k++){
 					for (int l = 0; l<boardSize; l++){
 						if(i != k && j != l && Math.abs(i-k) == Math.abs(j-l)){
-							terms.add(variables[(k*boardSize*boardSize)+l*boardSize+bishopPos]);
+							terms.add(variables[(k*boardSize*pieces.length)+l*pieces.length+bishopPos]);
 						}
 					}
 				}
@@ -203,7 +205,7 @@ public class CSP {
 						for (int l : lvalues){
 							if (0<=l && l<boardSize){
 								if (Math.abs(i-k) + Math.abs(j-l) == 3){
-									terms.add(variables[(k*boardSize*boardSize)+l*boardSize+knightPos]);
+									terms.add(variables[(k*boardSize*pieces.length)+l*pieces.length+knightPos]);
 								}
 							}
 						}
@@ -259,9 +261,9 @@ public class CSP {
 		BoolVar[] rooks = new BoolVar[boardSize*boardSize], bishops = new BoolVar[boardSize*boardSize], knights = new BoolVar[boardSize*boardSize];
 		for (int i=0; i<boardSize; i++){
 			for (int j=0; j<boardSize; j++){
-				rooks[i*boardSize+j] = variables[(i*boardSize*boardSize)+j*boardSize+rookPos];
-				bishops[i*boardSize+j] = variables[(i*boardSize*boardSize)+j*boardSize+bishopPos];
-				knights[i*boardSize+j] = variables[(i*boardSize*boardSize)+j*boardSize+knightPos];
+				rooks[i*boardSize+j] = variables[(i*boardSize*pieces.length)+j*pieces.length+rookPos];
+				bishops[i*boardSize+j] = variables[(i*boardSize*pieces.length)+j*pieces.length+bishopPos];
+				knights[i*boardSize+j] = variables[(i*boardSize*pieces.length)+j*pieces.length+knightPos];
 			}
 		}
 		model.sum(rooks, "=", k1).post();
@@ -275,7 +277,7 @@ public class CSP {
 			for (int j=0; j<boardSize; j++){
 				pos = new BoolVar[pieces.length];
 				for (int v=0; v<pieces.length; v++){
-					pos[v] = variables[(i*boardSize*boardSize)+j*boardSize+v];
+					pos[v] = variables[(i*boardSize*pieces.length)+j*pieces.length+v];
 				}
 				model.sum(pos, "<=", 1).post();
 			}
@@ -287,7 +289,7 @@ public class CSP {
 		for (int i = 0; i < boardSize; i++){
 			for (int j = 0; j<boardSize; j++){
 				for (int v=0; v<pieces.length; v++){
-					if (variables[i*boardSize*boardSize+j*boardSize+v].getValue() == 1){
+					if (variables[i*boardSize*pieces.length+j*pieces.length+v].getValue() == 1){
 						switch(v){
 							case 0:
 								board.addPiece(i,j,new Rook(i,j));
@@ -325,7 +327,7 @@ public class CSP {
 				valueIndex = k;
 			}
 		}
-		return variables[(i*boardSize*boardSize)+j*boardSize+valueIndex];
+		return variables[(i*boardSize*pieces.length)+j*pieces.length+valueIndex];
 	}
 	
 	static void print(Board board){
