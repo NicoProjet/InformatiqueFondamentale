@@ -1,8 +1,8 @@
 package museum;
 
 public class Museum {
-	private int _length;
-	private int _width;
+	public final int _length;
+	public final int _width;
 	private MuseumObject[][] _museum;
 	private int _numberOfObjects;
 	
@@ -15,7 +15,7 @@ public class Museum {
 
 	public void addObstacle(int x, int y, MuseumObject object) {
 		_museum[x][y] = object;
-		_numberOfObjects++;		
+		_numberOfObjects++;
 	}
 	
 	public int getNumberOfObjects(){
@@ -26,7 +26,7 @@ public class Museum {
 		return _numberOfObjects == 0;
 	}
 	
-	public String toStrin(){
+	public String toString(){
 		String s = "";
 		for (int i=0; i<_length; i++){
 			for (int j=0; j<_width; j++){
