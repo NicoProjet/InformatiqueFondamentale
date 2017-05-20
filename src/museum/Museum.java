@@ -49,5 +49,9 @@ public class Museum {
 	public char getValue(int x, int y){
 		return _museum[x][y].getValue();
 	}
+	
+	public boolean wallAt(int x, int y){
+		return _museum[x][y] != null && _museum[x][y].getValue() == '*';
+	}
 
 }

@@ -70,6 +70,26 @@ En plus des contraintes d'unicité et pièces requises, nous avons une grosse co
     peut s'écrire
     \[  \neg ( \neg A \land \neg B \land \neg C )\]
     On aurait aussi pu utiliser la méthode Constraint.merge() (qui permet un code plus lisible) mais nous ne l'avions pas vu dans la javadoc à ce stade.
+    
+    \item update Domination:\\
+    J'ai eu vent vers la fin du projet, que les cases occupées ne sont pas "transparentes". Pour être plus clair, une tour ne menace plus la fin d'une ligne si il y a déjà une pièce sur son chemin (je pensais qu' ajouter cette difficulté des obstacles était l'intérêt de la question 5).\\
+    \[ v0 \in V \]
+    \[ \text{Domaines pour les tours} \]
+    \[ k \neq i \land l \neq j\]
+    \[ k = i \land l < j \longrightarrow  m=k \land 0 \leq n < l\]
+    \[ k = i \land l > j \longrightarrow  m=k \land l < n < largeur  \]
+    \[ k < i \land l = j \longrightarrow  n=l \land 0 \leq m < k\]
+    \[ k > i \land l = j \longrightarrow  n=l \land k < m < longueur  \]
+    \[ \text{Domaines pour les fous} \]
+    \[ (i,j) \neq (k,l) \neq (k,l) \land |i-k| = |j-l| = |m-n| \]
+    \[ i < m \land j < n \longrightarrow 0 \leq m < i \land 0 \leq n < j\]
+    \[ i < m \land j > n \longrightarrow 0 \leq m < i \land j < n \leq largeur\]
+    \[ i > m \land j < n \longrightarrow i < m \leq longueur \land 0 \leq n < j\]
+    \[ i > m \land j > n \longrightarrow i < m \leq longueur \land j < n \leq largeur\]
+    \[ \text{Rien ne change au niveau des cavaliers car ils sautent au dessus des pièces} \]
+    \[ \text{Contrainte} \]
+    \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( ( X_{k,j,T} \lor X_{i,l,T} ) \land_{m,n,v0} X_{m,n,v0} ) \] 
+    \[ \lor_{k,l} ( X_{k,l,F} \land_{m0,n0} X_{m0,n0,v0} ) \lor_{k,l} X_{k,l,C} \]
 \end{enumerate}
 
 
@@ -95,7 +115,7 @@ Cette fois-ci, nous n'avons plus besoin des contraintes d'unicité et nombre de 
         .findOptimalSolution(tot_knights, Model.MINIMIZE); \end{verbatim}
 \end{enumerate}
 
-
+\newpage
 
 \subsection{Question 5: Musée}
 La question peut-être ramenée à une domination de tour (à menace uni-directionnelle), ce seront les caméras. En ajoutant la difficulté des obstacles, murs et autres caméras qui obstruent la vision (menace).\\
@@ -103,8 +123,8 @@ La question peut-être ramenée à une domination de tour (à menace uni-directi
 \subsubsection{Variables}
 
 \begin{itemize}
-    \item i est toujours un entier $\land$ 0 $\leq$ i < longueur du musée
-    \item j est toujours un entier $\land$ 0 $\leq$ j < largeur du musée
+    \item i est toujours un entier $\land$ 0 $\leq$ i $<$ longueur du musée
+    \item j est toujours un entier $\land$ 0 $\leq$ j $<$ largeur du musée
     \item V = \{O,E,S,W,N\} respectivement objet, est, sud, ouest, nord
     \item v $\in$ V
 \end{itemize}
@@ -127,11 +147,13 @@ La question peut-être ramenée à une domination de tour (à menace uni-directi
     
     \item Chaque case est occupée par une caméra ou "menacée" par une caméra:\\
     Lorsqu'on regarde dans une direction, on ne regarde que les caméras qui nous intéressent\\
-    Ainsi que si un obstacle obstrue la vision
+    Ainsi que si un obstacle obstrue la vision. 
     \[ k = i \land l < j \longrightarrow v0 = E \land m=k \land 0 \leq n < l\]
-    \[ k = i \land l > j \longrightarrow v0 = W \land m=k \land 0 \leq n < l\]
+    \[ k = i \land l > j \longrightarrow v0 = W \land m=k \land l < n < largeur  \]
     \[ k < i \land l = j \longrightarrow v0 = N \land n=l \land 0 \leq m < k\]
-    \[ k > i \land l = j \longrightarrow v0 = S \land n=l \land 0 \leq m < k\]
+    \[ k > i \land l = j \longrightarrow v0 = S \land n=l \land k < m < longeur  \]
+    On ingore les murs pour le premier terme de la contrainte
+    \[ v \in V/\{O\}\]
     \[ v1 \in V \]
     \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( X_{k,l,v0} \land_{m,n} \neg X_{m,n,v1} )\]
 \end{enumerate}

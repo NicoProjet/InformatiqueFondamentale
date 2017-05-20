@@ -39,86 +39,88 @@ public class CSP {
 		int D2 = possibleObjects.length; // simulated second dimension
 		for (int i=0; i<museum._length; i++){
 			for (int j=0; j<museum._width; j++){
-				ArrayList<Constraint> constraints_OR = new ArrayList<Constraint>();
-				// 1) check if object at (i,j) 
-				for (int v=0; v<possibleObjects.length; v++){
-					constraints_OR.add(model.and(variables[i*D1 + j*D2 + v]));
-				}
-				// check if seen by another camera row i
-				int orientation = 0;
-				for(int k=0; k<museum._length; k++){
-					if (k != i){
-						if (k < i){
-							// 2) if camera watching south without obstacles
-							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = SOUTH_INDEX;
-							terms.add(variables[k*D1 + j*D2 + orientation]); // check if camera right direction = CD
-							for (int m=k+1; m<i; m++){ // check if no obstacles between them = WB
-								for (int v = 0; v<possibleObjects.length; v++){
-									terms.add(variables[m*D1 + j*D2 + v].not());
+				if(!museum.wallAt(i, j)){
+					ArrayList<Constraint> constraints_OR = new ArrayList<Constraint>();
+					// 1) check if object at (i,j) 
+					for (int v=0; v<possibleObjects.length; v++){
+						constraints_OR.add(model.and(variables[i*D1 + j*D2 + v]));
+					}
+					// check if seen by another camera row i
+					int orientation = 0;
+					for(int k=0; k<museum._length; k++){
+						if (k != i){
+							if (k < i){
+								// 2) if camera watching south without obstacles
+								ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
+								orientation = SOUTH_INDEX;
+								terms.add(variables[k*D1 + j*D2 + orientation]); // check if camera right direction = CD
+								for (int m=k+1; m<i; m++){ // check if no obstacles between them = WB
+									for (int v = 0; v<possibleObjects.length; v++){
+										terms.add(variables[m*D1 + j*D2 + v].not());
+									}
 								}
+								BoolVar[] termsArray = CSP.toArray(terms);
+								constraints_OR.add(model.and(termsArray)); // Adds ( CD AND WB ) to constraints_OR_0
 							}
-							BoolVar[] termsArray = CSP.toArray(terms);
-							constraints_OR.add(model.and(termsArray)); // Adds ( CD AND WB ) to constraints_OR_0
-						}
-						else{
-							// 3) if camera watching north without obstacles
-							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = NORTH_INDEX;
-							terms.add(variables[k*D1 + j*D2 + orientation]);
-							for (int n=k-1; n>i; n--){
-								for (int v = 0; v<possibleObjects.length; v++){
-									terms.add(variables[n*D1 + j*D2 + v].not());
+							else{
+								// 3) if camera watching north without obstacles
+								ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
+								orientation = NORTH_INDEX;
+								terms.add(variables[k*D1 + j*D2 + orientation]);
+								for (int n=k-1; n>i; n--){
+									for (int v = 0; v<possibleObjects.length; v++){
+										terms.add(variables[n*D1 + j*D2 + v].not());
+									}
 								}
+								BoolVar[] termsArray = CSP.toArray(terms);
+								constraints_OR.add(model.and(termsArray));
 							}
-							BoolVar[] termsArray = CSP.toArray(terms);
-							constraints_OR.add(model.and(termsArray));
 						}
 					}
-				}
-				// check if seen by another camera column j
-				for(int k=0; k<museum._width; k++){
-					if (k != j){
-						if (k < j){
-							// 4) if camera watching east without obstacles
-							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = EAST_INDEX;
-							terms.add(variables[i*D1 + k*D2 + orientation]);
-							for (int m=k+1; m<j; m++){
-								for (int v = 0; v<possibleObjects.length; v++){
-									terms.add(variables[i*D1 + m*D2 + v].not());
+					// check if seen by another camera column j
+					for(int k=0; k<museum._width; k++){
+						if (k != j){
+							if (k < j){
+								// 4) if camera watching east without obstacles
+								ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
+								orientation = EAST_INDEX;
+								terms.add(variables[i*D1 + k*D2 + orientation]);
+								for (int m=k+1; m<j; m++){
+									for (int v = 0; v<possibleObjects.length; v++){
+										terms.add(variables[i*D1 + m*D2 + v].not());
+									}
 								}
+								BoolVar[] termsArray = CSP.toArray(terms);
+								constraints_OR.add(model.and(termsArray));
 							}
-							BoolVar[] termsArray = CSP.toArray(terms);
-							constraints_OR.add(model.and(termsArray));
-						}
-						else{
-							// 5) if camera watching west without obstacles
-							ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
-							orientation = WEST_INDEX;
-							terms.add(variables[i*D1 + k*D2 + orientation]);
-							for (int n=k-1; n>j; n--){
-								for (int v = 0; v<possibleObjects.length; v++){
-									terms.add(variables[i*D1 + n*D2 + v].not());
+							else{
+								// 5) if camera watching west without obstacles
+								ArrayList<BoolVar> terms = new ArrayList<BoolVar>();
+								orientation = WEST_INDEX;
+								terms.add(variables[i*D1 + k*D2 + orientation]);
+								for (int n=k-1; n>j; n--){
+									for (int v = 0; v<possibleObjects.length; v++){
+										terms.add(variables[i*D1 + n*D2 + v].not());
+									}
 								}
+								BoolVar[] termsArray = CSP.toArray(terms);
+								constraints_OR.add(model.and(termsArray));
 							}
-							BoolVar[] termsArray = CSP.toArray(terms);
-							constraints_OR.add(model.and(termsArray));
 						}
 					}
+					/*
+					 *  MERGE all the constraints in constraints_OR
+					 *  merge does "and" operands so we have to express "or" with
+					 *  not ( not A and not B and not C ... )
+					 */
+					Constraint[] cs = new Constraint[constraints_OR.size()];
+					for (int index = 0; index <constraints_OR.size(); index ++){
+						cs[index] = constraints_OR.get(index).getOpposite();
+					}
+					Constraint c = Constraint.merge("", cs);
+					c = c.getOpposite();
+					c.post();
 				}
-				/*
-				 *  MERGE all the constraints in constraints_OR
-				 *  merge does "and" operands so we have to express "or" with
-				 *  not ( not A and not B and not C ... )
-				 */
-				Constraint[] cs = new Constraint[constraints_OR.size()];
-				for (int index = 0; index <constraints_OR.size(); index ++){
-					cs[index] = constraints_OR.get(index).getOpposite();
-				}
-				Constraint c = Constraint.merge("", cs);
-				c = c.getOpposite();
-				c.post();
 			}
 		}
 	}
