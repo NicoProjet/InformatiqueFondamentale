@@ -1,0 +1,142 @@
+\section{Modèles}
+
+
+\subsection{Variables}
+Nous ne traitons que des entiers donc i $\leq$ n $\longrightarrow$ i $\in$ N $\land$ i $\leq$ n \\
+n = taille du tableau\\
+k1 = nombre de tours\\
+k2 = nombre de fous\\
+k3 = nombre de cavaliers\\
+
+Si ce n'est pas précisé: \\
+les lignes sont itérées sur i, k $\leq$ n \\
+les colonnes sur j, l $\leq$ n \\
+la valeur de la case sur  V = \{T,F,C\} et v $\in$ V \\
+le nombre de pièce k $\in$ \{k1,k2,k3\}
+Cela clarifie fortement les notations. \\
+
+
+
+\subsection{Question 1: Indépendance}
+Modèle composé de plusieurs petites contraintes, évidemment, elles peuvent être mise sous forme d'une grosse contrainte séparée par des 'et' mais cela rendrait la lecture désagréable.\\
+
+\begin{enumerate}
+    \item Unicité:
+    \[ \sum_{i} \sum_{j} \sum_{v} X_{i,j,v}  \leq 1 \]
+    Cette contrainte peut aussi être exprimée avec une forme: \[ T \longrightarrow \neg ( F \lor C ) \]
+    
+    \item Chaque pièce est présente le nombre de fois requis:\\
+    Pour chaque valeur v $\in$ (T,F,C) on somme les variables en position (i,j) \\ rappel: on a des booléens
+    \[\sum_{i} \sum_{j} \land_{v / k}   X_{i,j,v}  \leq k \]
+    
+    \item indépendance des tours:\\
+    Si il y a une tour, aucune case menacée n'est occupée
+    \[ k \neq i \land l \neq j \]
+    \[ \land_{i,j} \neg Xi,j,T \lor_{k,l,v} ( \neg X_{k,j,v} \land \neg X_{i,l,v} ) \]
+    
+    \item indépendance des fous:\\
+    Si il y a un fou, aucune case menacée n'est occupée\\
+    \[ (i,j) \neq (k,l) \land |i-k| = |j-l| \]
+    \[ \land_{i,j} \neg X_{i,j,F} \lor_{k,l,v} \neg X_{k,l,v}  \]
+    
+    \item indépendance des cavaliers:\\
+    Si il y a un cavalier, aucune case menacée n'est occupée\\
+    \[  k \in \{i-2, i-1, i+1, i+2\} \land 0 \leq k < n \]
+    \[  l \in \{j-2, j-1, j+1, j+2\} \land 0 \leq l < n \]
+    \[  |i-k| + |j-l| = 3 \]
+    \[ \land_{i,j} \neg X_{i,j,C} \lor_{k,l,v} \neg X_{k,l,v}  \]
+\end{enumerate}
+
+
+
+\subsection{Question 2: Domination}
+En plus des contraintes d'unicité et pièces requises, nous avons une grosse contrainte avec ses termes séparés par des "ou".
+
+\begin{enumerate}
+    \item Unicité:
+    \[ \sum_{i} \sum_{j} \sum_{v} X_{i,j,v}  \leq 1 \]
+    Cette contrainte peut aussi être exprimée avec une forme: \[ T \longrightarrow \neg ( F \lor C ) \]
+    
+    \item Chaque pièce est présente le nombre de fois requis:\\
+    Pour chaque valeur v $\in$ (T,F,C) on somme les variables en position (i,j) \\ rappel: on a des booléens
+    \[\sum_{i} \sum_{j} \land_{v / k}   X_{i,j,v}  \leq k \]
+    
+    \item Domination:\\
+    Les domaines de k et l sont les mêmes que pour les indépendances, respectivement tour, fou puis cavalier
+    \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( X_{k,j,T} \lor X_{i,l,T} ) \lor_{k,l} X_{k,l,F} \lor_{k,l} X_{k,l,C} \]
+    Pour simplifier le problème, dans le code source, nous avons décidé de les transformer en plusieurs contraintes composées uniquement de négations et "et". Nous créons une arrayList de BoolVar et y mettons ces variables pour chaque case (donc tous les éléments séparés par des "or"). Ensuite on cast cette liste dynamique en un vecteur de même taille, en passant, on les inverse (négation). Et enfin, on cast ce vecteur en une contrainte dont on prend l'opposé et la post dans le problème.\\
+    En effet,
+    \[  A \lor B \lor C \]
+    peut s'écrire
+    \[  \neg ( \neg A \land \neg B \land \neg C )\]
+    On aurait aussi pu utiliser la méthode Constraint.merge() (qui permet un code plus lisible) mais nous ne l'avions pas vu dans la javadoc à ce stade.
+\end{enumerate}
+
+
+
+\subsection{Question 4: Domination des cavaliers en minimisant leur nombre}
+Cette fois-ci, nous n'avons plus besoin des contraintes d'unicité et nombre de pièces. Cependant, en plus du tableau de BoolVar contenant nos variables, nous avons aussi une variable entière IntVar qui est la somme de nos BoolVar (et donc le nombre de cavaliers).
+
+\begin{enumerate}
+    \item Domination par cavalier:
+    \[  k \in \{i-2, i-1, i+1, i+2\} \land 0 \leq k < n \]
+    \[  l \in \{j-2, j-1, j+1, j+2\} \land 0 \leq l < n \]
+    \[  |i-k| + |j-l| = 3 \]
+    \[  \land_{i,j} X_{i,j} \lor_{k,l} X_{k,l} \]
+    
+    \item \#cavaliers doit être minimisé:
+    \[  min \sum_{i,j} X_{i,j} \]
+    
+    Ceci est facilement mis en code source par la ligne:
+    \begin{verbatim} model.sum(variables, "=", tot_knights).post(); \end{verbatim}
+    
+    Ensuite pour minimiser ce nombre, il faut demander au solver de fournir la solution optimale en précisant si on veut minimiser ou maximiser la variable donnée:
+    \begin{verbatim} Solution sol = model.getSolver()\
+        .findOptimalSolution(tot_knights, Model.MINIMIZE); \end{verbatim}
+\end{enumerate}
+
+
+
+\subsection{Question 5: Musée}
+La question peut-être ramenée à une domination de tour (à menace uni-directionnelle), ce seront les caméras. En ajoutant la difficulté des obstacles, murs et autres caméras qui obstruent la vision (menace).\\
+
+\subsubsection{Variables}
+
+\begin{itemize}
+    \item i est toujours un entier $\land$ 0 $\leq$ i < longueur du musée
+    \item j est toujours un entier $\land$ 0 $\leq$ j < largeur du musée
+    \item V = \{O,E,S,W,N\} respectivement objet, est, sud, ouest, nord
+    \item v $\in$ V
+\end{itemize}
+
+
+\subsubsection{Contraintes}
+
+\begin{enumerate}
+    \item Ajout des murs:\\
+    Il faut forcer la valeur des murs à 1 (après avoir parsé un fichier indiquant leurs positions).
+    \[ \land_{i,j} mur (i,j) \longrightarrow  X_{i,j}\]
+    
+    \item Unicité:
+    \[ \sum_{i} \sum_{j} \sum_{v} X_{i,j,v}  \leq 1 \]
+    
+    \item \#caméras à minimiser:\\
+    On regarde tout sauf les v = O,
+    \[  v \in V/\{O\}\]
+    \[  min \sum_{i,j,v} X_{i,j,v} \]
+    
+    \item Chaque case est occupée par une caméra ou "menacée" par une caméra:\\
+    Lorsqu'on regarde dans une direction, on ne regarde que les caméras qui nous intéressent\\
+    Ainsi que si un obstacle obstrue la vision
+    \[ k = i \land l < j \longrightarrow v0 = E \land m=k \land 0 \leq n < l\]
+    \[ k = i \land l > j \longrightarrow v0 = W \land m=k \land 0 \leq n < l\]
+    \[ k < i \land l = j \longrightarrow v0 = N \land n=l \land 0 \leq m < k\]
+    \[ k > i \land l = j \longrightarrow v0 = S \land n=l \land 0 \leq m < k\]
+    \[ v1 \in V \]
+    \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( X_{k,l,v0} \land_{m,n} \neg X_{m,n,v1} )\]
+\end{enumerate}
+
+\subsubsection{Implémentation}
+Au niveau de l'implémentation, nous avons une grande méthode ajoutant la dernière contrainte présentée. Cette dernière pourrait être divisée en quatre si on préfère avoir des méthodes plus petites (mais dans ce cas-ci, elles ont besoin de beaucoup d'arguments).\\
+Cette méthode jongle avec des tableaux de BoolVar qu'on ajoute par la suite en une contrainte comme présenté dans la domination. On utilise ces tableaux pour trouver les obstacles entre une caméra et la case actuelle.\\
+Dans le reste des cas, on utilise la fonction Constraint.merge() pour les mettre en une et transformer des "or" en négations et "et" comme présenté précédemment. Enfin après cette fusion, la constrainte est posté, cette opération est effectuée une fois par case.

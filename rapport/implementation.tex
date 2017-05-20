@@ -1,0 +1,44 @@
+\section{Implémentation}
+
+
+\subsection{Echiquier}
+
+\subsubsection{Résumé des classes}
+$\ \ \ \ abstrait$
+\begin{itemize}
+    \item ChessPiece: représente une pièce quelconque\\
+        Deux méthodes doivent être surchargées: void addToBoard(Board) et String toString()
+\end{itemize}
+
+
+$concrait$
+\begin{itemize}
+    \item Rook: représente une tour (extends ChessPiece)
+    \item Bishop: représente un fou (extends ChessPiece)
+    \item Knight: représente un cavalier (extends ChessPiece)
+    \item Board: représente le tableau de jeu
+    \item CSP: classe statique contenant toutes les méthodes de résolution CSP
+    \item KnightsToDominate: contient le main du programme de minimisation de cavaliers
+    \item Main: contient le main du programme indépendance/domination
+\end{itemize}
+
+
+\newpage
+\subsection{Musée}
+
+\subsubsection{Résumé des classes}
+$\ \ \ \ abstrait$
+\begin{itemize}
+    \item MuseumObject: représente un objet quelconque placé dans le musée\\
+        Trois méthodes doivent être surchargées: void addToMuseum(Museum), char getValue() et String toString()
+\end{itemize}
+
+$concrait$
+\begin{itemize}
+    \item Camera: représente une caméra (extends MuseumObject)
+    \item Obstacle: représente un obstacle (extends MuseumObject)
+    \item Museum: représente un musée
+    \item Parser: contient le parser de fichier pour importer un musée (les murs)
+    \item CSP: classe statique contenant toutes les méthodes de résolution CSP
+    \item WatchMuseum: contient le main du programme
+\end{itemize}
