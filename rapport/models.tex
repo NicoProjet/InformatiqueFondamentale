@@ -13,7 +13,7 @@ les lignes sont itérées sur i, k $\leq$ n \\
 les colonnes sur j, l $\leq$ n \\
 la valeur de la case sur  V = \{T,F,C\} et v $\in$ V \\
 le nombre de pièce k $\in$ \{k1,k2,k3\}
-Cela clarifie fortement les notations. \\
+clarifie fortement les notations. \\
 
 
 
@@ -72,7 +72,7 @@ En plus des contraintes d'unicité et pièces requises, nous avons une grosse co
     On aurait aussi pu utiliser la méthode Constraint.merge() (qui permet un code plus lisible) mais nous ne l'avions pas vu dans la javadoc à ce stade.
     
     \item update Domination:\\
-    J'ai eu vent vers la fin du projet, que les cases occupées ne sont pas "transparentes". Pour être plus clair, une tour ne menace plus la fin d'une ligne si il y a déjà une pièce sur son chemin (je pensais qu' ajouter cette difficulté des obstacles était l'intérêt de la question 5).\\
+    Nous avons eu vent vers la fin du projet, que les cases occupées ne sont pas "transparentes". Pour être plus clair, une tour ne menace plus la fin d'une ligne si il y a déjà une pièce sur son chemin (nous pensions qu' ajouter cette difficulté des obstacles était l'intérêt de la question 5).\\
     \[ v0 \in V \]
     \[ \text{Domaines pour les tours} \]
     \[ k \neq i \land l \neq j\]
@@ -104,7 +104,7 @@ Cette fois-ci, nous n'avons plus besoin des contraintes d'unicité et nombre de 
     \[  |i-k| + |j-l| = 3 \]
     \[  \land_{i,j} X_{i,j} \lor_{k,l} X_{k,l} \]
     
-    \item \#cavaliers doit être minimisé:
+    \item nombre de cavaliers doit être minimisé:
     \[  min \sum_{i,j} X_{i,j} \]
     
     Ceci est facilement mis en code source par la ligne:
@@ -140,14 +140,14 @@ La question peut-être ramenée à une domination de tour (à menace uni-directi
     \item Unicité:
     \[ \sum_{i} \sum_{j} \sum_{v} X_{i,j,v}  \leq 1 \]
     
-    \item \#caméras à minimiser:\\
+    \item nombre de caméras à minimiser:\\
     On regarde tout sauf les v = O,
     \[  v \in V/\{O\}\]
     \[  min \sum_{i,j,v} X_{i,j,v} \]
     
     \item Chaque case est occupée par une caméra ou "menacée" par une caméra:\\
-    Lorsqu'on regarde dans une direction, on ne regarde que les caméras qui nous intéressent\\
-    Ainsi que si un obstacle obstrue la vision. 
+    Lorsqu'on regarde dans une direction, on ne regarde que les caméras qui nous intéressent
+    ainsi que si un obstacle obstrue la vision. 
     \[ k = i \land l < j \longrightarrow v0 = E \land m=k \land 0 \leq n < l\]
     \[ k = i \land l > j \longrightarrow v0 = W \land m=k \land l < n < largeur  \]
     \[ k < i \land l = j \longrightarrow v0 = N \land n=l \land 0 \leq m < k\]
@@ -157,6 +157,7 @@ La question peut-être ramenée à une domination de tour (à menace uni-directi
     \[ v1 \in V \]
     \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( X_{k,l,v0} \land_{m,n} \neg X_{m,n,v1} )\]
 \end{enumerate}
+
 
 \subsubsection{Implémentation}
 Au niveau de l'implémentation, nous avons une grande méthode ajoutant la dernière contrainte présentée. Cette dernière pourrait être divisée en quatre si on préfère avoir des méthodes plus petites (mais dans ce cas-ci, elles ont besoin de beaucoup d'arguments).\\

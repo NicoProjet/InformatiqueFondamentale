@@ -1,9 +1,9 @@
 \section{Implémentation}
 
 
-\subsection{Echiquier}
+\subsection{Résumé des classes}
 
-\subsubsection{Résumé des classes}
+\subsubsection{Echiquier}
 $\ \ \ \ abstrait$
 \begin{itemize}
     \item ChessPiece: représente une pièce quelconque\\
@@ -11,7 +11,7 @@ $\ \ \ \ abstrait$
 \end{itemize}
 
 
-$concrait$
+$concret$
 \begin{itemize}
     \item Rook: représente une tour (extends ChessPiece)
     \item Bishop: représente un fou (extends ChessPiece)
@@ -24,16 +24,15 @@ $concrait$
 
 
 \newpage
-\subsection{Musée}
 
-\subsubsection{Résumé des classes}
+\subsubsection{Musée}
 $\ \ \ \ abstrait$
 \begin{itemize}
     \item MuseumObject: représente un objet quelconque placé dans le musée\\
         Trois méthodes doivent être surchargées: void addToMuseum(Museum), char getValue() et String toString()
 \end{itemize}
 
-$concrait$
+$concret$
 \begin{itemize}
     \item Camera: représente une caméra (extends MuseumObject)
     \item Obstacle: représente un obstacle (extends MuseumObject)
@@ -42,3 +41,6 @@ $concrait$
     \item CSP: classe statique contenant toutes les méthodes de résolution CSP
     \item WatchMuseum: contient le main du programme
 \end{itemize}
+
+\subsection{Choix sur les variables}
+Au début, il y a eu une hésitation pour ce qui était d'ajouter la valeur "menacé" ("surveillé" pour le musée), dans la dimension de v. Cela aurait permis de mettre des contraintes plus courtes. Par manque de temps, il nous a été impossible de tester les deux pour voir lequel est le plus optimisé et dans quel cas il l'est.
