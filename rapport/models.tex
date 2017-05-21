@@ -88,8 +88,8 @@ En plus des contraintes d'unicité et pièces requises, nous avons une grosse co
     \[ i > m \land j > n \longrightarrow i < m \leq longueur \land j < n \leq largeur\]
     \[ \text{Rien ne change au niveau des cavaliers car ils sautent au dessus des pièces} \]
     \[ \text{Contrainte} \]
-    \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( ( X_{k,j,T} \lor X_{i,l,T} ) \land_{m,n,v0} X_{m,n,v0} ) \] 
-    \[ \lor_{k,l} ( X_{k,l,F} \land_{m0,n0} X_{m0,n0,v0} ) \lor_{k,l} X_{k,l,C} \]
+    \[  \land_{i,j,v} X_{i,j,v} \lor_{k,l} ( ( X_{k,j,T} \lor X_{i,l,T} ) \land_{m,n,v0} \neg X_{m,n,v0} ) \] 
+    \[ \lor_{k,l} ( X_{k,l,F} \land_{m0,n0} \neg X_{m0,n0,v0} ) \lor_{k,l} X_{k,l,C} \]
 \end{enumerate}
 
 
